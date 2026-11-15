@@ -17,9 +17,13 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    // Switch to scrolled/frosted navbar only when the About section comes into focus
+    const handleAboutInView = (e: Event) => {
+      const customEvent = e as CustomEvent<{ inView: boolean }>;
+      setScrolled(customEvent.detail.inView);
+    };
+    window.addEventListener("about-in-view", handleAboutInView);
+    return () => window.removeEventListener("about-in-view", handleAboutInView);
   }, []);
 
   return (

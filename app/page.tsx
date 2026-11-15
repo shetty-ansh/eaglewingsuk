@@ -1,49 +1,26 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import About from "@/components/About";
 
-/**
- * Put both images in /public:
- *   /public/jesus-potrait.png    (mobile, portrait)
- *   /public/jesus-landscape.png  (desktop, landscape)
- */
 const MOBILE_SRC = "/images/jesus-potrait.png";
 const DESKTOP_SRC = "/images/jesus-landscape.png";
-
-// The soft golden yellow the light ends in. Match the next section to this.
 const ACCENT = "#f7f1e6";
-const ACCENT_SOFT = "#FBE7A6";
-const ACCENT_GLOW = "#FFF3CF";
 
-/**
- * Each orb is one soft bokeh circle.
- * x: horizontal position (%), size: px, travel: how far it drifts down (vh),
- * grow: extra scale at the end, blur: px, alpha: peak brightness,
- * float: seconds for the slow idle drift.
- */
+// ── Timing & Focus Controls (0.0 = top of hero, 1.0 = scroll complete) ───
+// Adjust these values to control when the About section appears:
+const ABOUT_FADE_START = 0.80; // Scroll point where About starts fading in
+const ABOUT_FADE_END = 0.95;   // Scroll point where About reaches full opacity
+
 const ORBS = [
-  { x: 8, size: 180, travel: 70, grow: 2.2, blur: 18, alpha: 0.55, float: 11 },
-  { x: 20, size: 90, travel: 95, grow: 1.6, blur: 8, alpha: 0.7, float: 8 },
-  { x: 31, size: 240, travel: 60, grow: 2.6, blur: 26, alpha: 0.45, float: 14 },
-  { x: 43, size: 120, travel: 85, grow: 1.9, blur: 12, alpha: 0.6, float: 9 },
-  { x: 52, size: 300, travel: 50, grow: 3, blur: 34, alpha: 0.5, float: 16 },
-  { x: 62, size: 70, travel: 105, grow: 1.5, blur: 6, alpha: 0.75, float: 7 },
-  { x: 71, size: 200, travel: 75, grow: 2.3, blur: 20, alpha: 0.5, float: 12 },
-  { x: 82, size: 110, travel: 90, grow: 1.8, blur: 10, alpha: 0.65, float: 10 },
-  { x: 92, size: 220, travel: 65, grow: 2.4, blur: 24, alpha: 0.45, float: 13 },
-  { x: 14, size: 140, travel: 120, grow: 1.7, blur: 14, alpha: 0.4, float: 15 },
-  { x: 57, size: 160, travel: 115, grow: 2, blur: 16, alpha: 0.4, float: 12 },
-  { x: 88, size: 80, travel: 125, grow: 1.5, blur: 8, alpha: 0.45, float: 9 },
+  { x: 20, size: 90, travel: 95, grow: 1.6, blur: 8, alpha: 0.45, float: 8 },
+  { x: 43, size: 120, travel: 85, grow: 1.9, blur: 12, alpha: 0.35, float: 9 },
+  { x: 52, size: 280, travel: 50, grow: 2.8, blur: 32, alpha: 0.30, float: 16 },
+  { x: 62, size: 70, travel: 105, grow: 1.5, blur: 6, alpha: 0.50, float: 7 },
+  { x: 82, size: 110, travel: 90, grow: 1.8, blur: 10, alpha: 0.38, float: 10 },
 ];
 
 export default function RootPage() {
-  return (
-    <>
-      <HeroSection />
-      <About />
-    </>
-  );
+  return <HeroSection />;
 }
 
 function HeroSection() {
@@ -60,14 +37,24 @@ function HeroSection() {
       const rect = section.getBoundingClientRect();
       const scrollable = rect.height - window.innerHeight;
       const raw = scrollable > 0 ? -rect.top / scrollable : 0;
-      const progress = Math.min(1, Math.max(0, raw));
-      // Written straight to CSS, so React never re-renders while scrolling.
-      section.style.setProperty("--p", progress.toFixed(4));
+      const p = Math.min(1, Math.max(0, raw));
+
+      // Cheap CSS write — no React re-render on every scroll frame
+      section.style.setProperty("--p", p.toFixed(4));
+
+      // As soon as the light starts engulfing (any scroll > 0.02), instantly drop text shadow
+      section.classList.toggle("hero--engulfing", p > 0.02);
+
+      // Enable pointer events on About once it reaches view
+      section.classList.toggle("hero--about-on", p >= ABOUT_FADE_END * 0.95);
+
+      // Notify Navbar to update color only when About comes into focus
+      window.dispatchEvent(
+        new CustomEvent("about-in-view", { detail: { inView: p >= ABOUT_FADE_START } })
+      );
     };
 
-    const onScroll = () => {
-      if (!frame) frame = requestAnimationFrame(update);
-    };
+    const onScroll = () => { if (!frame) frame = requestAnimationFrame(update); };
 
     update();
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -87,7 +74,8 @@ function HeroSection() {
       style={{ ["--p" as string]: 0 }}
     >
       <div className="hero__stage">
-        {/* Painting: portrait on mobile, landscape on desktop */}
+
+        {/* ── Painting ─────────────────────────────────── */}
         <picture>
           <source media="(min-width: 768px)" srcSet={DESKTOP_SRC} />
           <img
@@ -99,13 +87,16 @@ function HeroSection() {
           />
         </picture>
 
-        {/* Wide mist that spills in from above the screen */}
-        <div className="hero__mist" aria-hidden="true" />
+        {/* ── Soft ambient glow at the light source ────── */}
+        <div className="hero__ambient" aria-hidden="true" />
 
-        {/* The main beam, centred above the top edge, growing as you scroll */}
-        <div className="hero__beam" aria-hidden="true" />
+        {/* ── Conical spotlight — soft outer halo ──────── */}
+        <div className="hero__cone-halo" aria-hidden="true" />
 
-        {/* Bokeh orbs drifting down out of the light */}
+        {/* ── Conical spotlight — main beam ────────────── */}
+        <div className="hero__cone" aria-hidden="true" />
+
+        {/* ── Bokeh orbs ───────────────────────────────── */}
         <div className="hero__bokeh" aria-hidden="true">
           {ORBS.map((o, i) => (
             <span
@@ -128,23 +119,52 @@ function HeroSection() {
           ))}
         </div>
 
-        {/* Final fill: the whole viewport settles into the accent colour */}
+        {/* ── Parchment fill — covers everything at p=1 ── */}
         <div className="hero__fill" aria-hidden="true" />
 
-        {/* Two-line tagline — fades out as scroll progresses */}
+        {/* ── About — fades in from behind the light ────── */}
+        {/* Sits above the fill (z:20). Pointer-events off   */}
+        {/* until hero--about-on class is set by scroll JS. */}
+        <div className="hero__about" id="about" aria-label="About Eagles Wings UK">
+          <div className="about__inner">
+
+            <p className="about__eyebrow">Who We Are</p>
+
+            <h2 className="about__heading">
+              Standing with Israel,<br />
+              rooted in faith.
+            </h2>
+
+            <div className="about__divider" aria-hidden="true" />
+
+            <p className="about__body">
+              Eagles Wings UK is a Christian organisation dedicated to building
+              bridges of friendship between the Church and the Jewish people.
+              Grounded in the biblical covenant between God and Israel, we
+              mobilise communities across the United Kingdom to pray, advocate,
+              and journey alongside the nation of Israel.
+            </p>
+
+            <a href="/about" className="about__cta">Learn more</a>
+          </div>
+        </div>
+
+        {/* ── Tagline — fades out as scroll begins ──────── */}
         <div className="hero__tagline" aria-label="Tagline">
           <p className="hero__tagline-l1">Encounter the God of the Bible.</p>
           <p className="hero__tagline-l2">Meet the people of the Bible.</p>
         </div>
+
       </div>
 
       <style>{`
+        /* ── Section ───────────────────────────────────────────────── */
         .hero {
           --accent: ${ACCENT};
-          --accent-soft: ${ACCENT_SOFT};
-          --accent-glow: ${ACCENT_GLOW};
+          --about-start: ${ABOUT_FADE_START};
+          --about-end: ${ABOUT_FADE_END};
           position: relative;
-          height: 140vh;
+          height: 115vh;
           background: var(--accent);
         }
         .hero__stage {
@@ -156,6 +176,8 @@ function HeroSection() {
           overflow: hidden;
           isolation: isolate;
         }
+
+        /* ── Painting ──────────────────────────────────────────────── */
         .hero__image {
           position: absolute;
           inset: 0;
@@ -163,58 +185,67 @@ function HeroSection() {
           height: 100%;
           object-fit: cover;
           object-position: center;
-          filter: brightness(calc(1 + var(--p) * 0.18)) saturate(calc(1 - var(--p) * 0.25));
+          filter: brightness(calc(1 + var(--p) * 0.15)) saturate(calc(1 - var(--p) * 0.3));
           will-change: filter;
         }
 
-        /* Mist: soft haze that thickens with scroll */
-        .hero__mist {
+        /* ── Ambient glow ──────────────────────────────────────────── */
+        .hero__ambient {
           position: absolute;
           inset: 0;
-          background:
-            radial-gradient(120% 70% at 50% -15%, var(--accent-glow) 0%, rgba(251,231,166,0.55) 35%, transparent 70%),
-            radial-gradient(80% 50% at 15% 0%, rgba(255,243,207,0.6), transparent 70%),
-            radial-gradient(80% 50% at 85% 0%, rgba(255,243,207,0.6), transparent 70%);
-          filter: blur(30px);
-          opacity: calc(0.25 + var(--p) * 0.75);
-          mix-blend-mode: screen;
-          transform: translateY(calc(var(--p) * 25vh)) scale(calc(1 + var(--p) * 0.6));
-          transform-origin: 50% 0%;
-          will-change: transform, opacity;
-        }
-
-        /* Beam: big glow whose centre sits above the screen */
-        .hero__beam {
-          position: absolute;
-          left: 50%;
-          top: 0;
-          width: 160vmax;
-          height: 160vmax;
-          margin-left: -80vmax;
-          margin-top: -80vmax;
-          border-radius: 50%;
           background: radial-gradient(
-            circle at 50% 50%,
-            var(--accent-glow) 0%,
-            rgba(255,243,207,0.9) 12%,
-            rgba(251,231,166,0.7) 26%,
-            rgba(243,207,114,0.35) 42%,
-            transparent 62%
+            ellipse 40% 28% at 50% -4%,
+            rgba(255, 252, 230, 0.65) 0%,
+            transparent 100%
           );
-          filter: blur(12px);
           mix-blend-mode: screen;
-          transform: scale(calc(0.22 + var(--p) * 1.25));
-          opacity: calc(0.45 + var(--p) * 0.55);
-          will-change: transform, opacity;
+          pointer-events: none;
         }
 
-        /* Bokeh */
+        /* ── Conical spotlight ─────────────────────────────────────── */
+        /* No clip-path. Shape + soft edges come entirely from the     */
+        /* radial-gradient ellipse. Rx grows with --p.                 */
+
+        .hero__cone-halo {
+          position: absolute;
+          inset: 0;
+          background: radial-gradient(
+            ellipse calc(18% + var(--p) * 76%) 130% at 50% -5%,
+            rgba(255, 252, 215, 0.60)  0%,
+            rgba(251, 231, 166, 0.38) 28%,
+            rgba(247, 241, 230, 0.18) 58%,
+            transparent 80%
+          );
+          mix-blend-mode: screen;
+          filter: blur(28px);
+          opacity: calc(0.45 + var(--p) * 0.50);
+          will-change: opacity;
+        }
+
+        .hero__cone {
+          position: absolute;
+          inset: 0;
+          background: radial-gradient(
+            ellipse calc(10% + var(--p) * 80%) 120% at 50% -5%,
+            rgba(255, 255, 255, 0.96)  0%,
+            rgba(255, 252, 230, 0.80) 14%,
+            rgba(252, 237, 180, 0.52) 34%,
+            rgba(248, 230, 158, 0.22) 54%,
+            transparent 72%
+          );
+          mix-blend-mode: screen;
+          filter: blur(10px);
+          opacity: calc(0.50 + var(--p) * 0.50);
+          will-change: opacity;
+        }
+
+        /* ── Bokeh ─────────────────────────────────────────────────── */
         .hero__bokeh {
           position: absolute;
           inset: 0;
           pointer-events: none;
           mix-blend-mode: screen;
-          opacity: clamp(0, calc(0.4 + var(--p) * 2), 1);
+          opacity: clamp(0, calc(0.25 + var(--p) * 1.4), 0.8);
         }
         .hero__orb {
           position: absolute;
@@ -242,31 +273,98 @@ function HeroSection() {
         }
         @keyframes hero-float {
           from { transform: translate3d(-14px, -10px, 0); }
-          to   { transform: translate3d(14px, 12px, 0); }
+          to   { transform: translate3d( 14px,  12px, 0); }
         }
 
-        /* Final golden fill, only in the last 30% of the scroll */
+        /* ── Parchment fill ────────────────────────────────────────── */
         .hero__fill {
           position: absolute;
           inset: 0;
           background: var(--accent);
-          opacity: clamp(0, calc((var(--p) - 0.5) * 2), 1);
+          opacity: clamp(0, calc((var(--p) - 0.45) * 1.82), 1);
           will-change: opacity;
         }
 
-        @media (prefers-reduced-motion: reduce) {
-          .hero__orb i { animation: none; }
+        /* ── About overlay ─────────────────────────────────────────── */
+        /* Fades in through the parchment once the light is complete.  */
+        .hero__about {
+          position: absolute;
+          inset: 0;
+          z-index: 20;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 7rem 2rem;
+          /* Controlled by ABOUT_FADE_START and ABOUT_FADE_END */
+          opacity: clamp(0, calc((var(--p) - var(--about-start)) / (var(--about-end) - var(--about-start))), 1);
+          will-change: opacity;
+          /* Not interactive until the scroll JS adds hero--about-on */
+          pointer-events: none;
         }
-        @media (max-width: 767px) {
-          .hero { height: 140vh; }
-          .hero__orb { scale: 0.7; }
+        .hero--about-on .hero__about {
+          pointer-events: auto;
         }
 
-        /* ── Tagline ─────────────────────────────────────────────────── */
+        .about__inner {
+          max-width: 640px;
+          text-align: center;
+        }
+        .about__eyebrow {
+          font-family: var(--font-manrope), sans-serif;
+          font-size: 0.7rem;
+          font-weight: 600;
+          letter-spacing: 0.22em;
+          text-transform: uppercase;
+          color: #b08a4a;
+          margin: 0 0 1.5rem;
+        }
+        .about__heading {
+          font-family: var(--font-primary), 'Georgia', serif;
+          font-size: clamp(1.9rem, 4.5vw, 3rem);
+          font-weight: 500;
+          line-height: 1.2;
+          color: #2c1f0e;
+          margin: 0 0 2rem;
+          letter-spacing: -0.01em;
+        }
+        .about__divider {
+          width: 48px;
+          height: 1px;
+          background: #c8973a;
+          margin: 0 auto 2rem;
+          opacity: 0.6;
+        }
+        .about__body {
+          font-family: var(--font-manrope), sans-serif;
+          font-size: 1rem;
+          font-weight: 400;
+          line-height: 1.8;
+          color: #5a4228;
+          margin: 0 0 2.5rem;
+        }
+        .about__cta {
+          display: inline-block;
+          text-decoration: none;
+          font-family: var(--font-manrope), sans-serif;
+          font-size: 0.72rem;
+          font-weight: 600;
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
+          color: #b08a4a;
+          border-bottom: 1px solid rgba(176, 138, 74, 0.4);
+          padding-bottom: 3px;
+          transition: color 0.25s, border-color 0.25s;
+        }
+        .about__cta:hover {
+          color: #8a6530;
+          border-color: #8a6530;
+        }
+
+        /* ── Tagline ───────────────────────────────────────────────── */
         .hero__tagline {
           position: absolute;
           inset: 0;
-          z-index: 10;
+          z-index: 30;
           pointer-events: none;
           display: flex;
           flex-direction: column;
@@ -274,10 +372,12 @@ function HeroSection() {
           justify-content: center;
           text-align: center;
           padding: 0 1.5rem;
-          padding-bottom: 22vh; /* shifts centre-point upward */
-          opacity: clamp(0, calc(1 - var(--p) * 2.5), 1);
-          transform: translateY(calc(var(--p) * -24px));
+          padding-bottom: 22vh;
+          opacity: 1;
+          transform: translateY(0);
           will-change: opacity, transform;
+          transition: opacity 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                      transform 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
           animation: tagline-in 1.1s cubic-bezier(.22,.61,.36,1) both;
         }
         @keyframes tagline-in {
@@ -307,6 +407,25 @@ function HeroSection() {
           color: rgba(255, 255, 255, 0.60);
           text-shadow: 0 2px 18px rgba(60, 35, 5, 0.45);
           margin: 0;
+        }
+
+        /* When light starts engulfing: instantly drop shadows and fade text out */
+        .hero--engulfing .hero__tagline-l1,
+        .hero--engulfing .hero__tagline-l2 {
+          text-shadow: none !important;
+        }
+        .hero--engulfing .hero__tagline {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .hero__orb i  { animation: none; }
+          .hero__tagline { animation: none; }
+        }
+        @media (max-width: 767px) {
+          .hero__orb { scale: 0.7; }
+          .about__heading { font-size: clamp(1.6rem, 6vw, 2.4rem); }
         }
       `}</style>
     </section>

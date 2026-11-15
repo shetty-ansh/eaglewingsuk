@@ -1,6 +1,29 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+
 export default function About() {
+  const ref = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    // Fade in as soon as 5 % of the section enters the viewport
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          el.classList.add("about--visible");
+          io.disconnect();          // fire once, then stop observing
+        }
+      },
+      { threshold: 0.05 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   return (
-    <section id="about" className="about">
+    <section ref={ref} id="about" className="about">
       <div className="about__inner">
         <p className="about__eyebrow">Who We Are</p>
 
@@ -25,6 +48,7 @@ export default function About() {
       </div>
 
       <style>{`
+        /* ── Section shell ─────────────────────────────────────────── */
         .about {
           background: #f7f1e6;
           min-height: 100vh;
@@ -32,8 +56,16 @@ export default function About() {
           align-items: center;
           justify-content: center;
           padding: 7rem 2rem;
+
+          /* Starts invisible; fades in when .about--visible is added */
+          opacity: 0;
+          transition: opacity 1.4s cubic-bezier(.25,.46,.45,.94);
+        }
+        .about--visible {
+          opacity: 1;
         }
 
+        /* ── Inner layout ──────────────────────────────────────────── */
         .about__inner {
           max-width: 680px;
           text-align: center;
@@ -97,4 +129,3 @@ export default function About() {
     </section>
   );
 }
-
