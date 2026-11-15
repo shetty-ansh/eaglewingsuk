@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import About from "@/components/About";
 
 /**
  * Put both images in /public:
@@ -11,7 +12,7 @@ const MOBILE_SRC = "/images/jesus-potrait.png";
 const DESKTOP_SRC = "/images/jesus-landscape.png";
 
 // The soft golden yellow the light ends in. Match the next section to this.
-const ACCENT = "#F3CF72";
+const ACCENT = "#f7f1e6";
 const ACCENT_SOFT = "#FBE7A6";
 const ACCENT_GLOW = "#FFF3CF";
 
@@ -36,7 +37,16 @@ const ORBS = [
   { x: 88, size: 80, travel: 125, grow: 1.5, blur: 8, alpha: 0.45, float: 9 },
 ];
 
-export default function HeroSection() {
+export default function RootPage() {
+  return (
+    <>
+      <HeroSection />
+      <About />
+    </>
+  );
+}
+
+function HeroSection() {
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -120,6 +130,12 @@ export default function HeroSection() {
 
         {/* Final fill: the whole viewport settles into the accent colour */}
         <div className="hero__fill" aria-hidden="true" />
+
+        {/* Two-line tagline — fades out as scroll progresses */}
+        <div className="hero__tagline" aria-label="Tagline">
+          <p className="hero__tagline-l1">Encounter the God of the Bible.</p>
+          <p className="hero__tagline-l2">Meet the people of the Bible.</p>
+        </div>
       </div>
 
       <style>{`
@@ -128,7 +144,7 @@ export default function HeroSection() {
           --accent-soft: ${ACCENT_SOFT};
           --accent-glow: ${ACCENT_GLOW};
           position: relative;
-          height: 320vh;
+          height: 140vh;
           background: var(--accent);
         }
         .hero__stage {
@@ -234,7 +250,7 @@ export default function HeroSection() {
           position: absolute;
           inset: 0;
           background: var(--accent);
-          opacity: clamp(0, calc((var(--p) - 0.7) * 3.3334), 1);
+          opacity: clamp(0, calc((var(--p) - 0.5) * 2), 1);
           will-change: opacity;
         }
 
@@ -242,8 +258,55 @@ export default function HeroSection() {
           .hero__orb i { animation: none; }
         }
         @media (max-width: 767px) {
-          .hero { height: 280vh; }
+          .hero { height: 140vh; }
           .hero__orb { scale: 0.7; }
+        }
+
+        /* ── Tagline ─────────────────────────────────────────────────── */
+        .hero__tagline {
+          position: absolute;
+          inset: 0;
+          z-index: 10;
+          pointer-events: none;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+          padding: 0 1.5rem;
+          padding-bottom: 22vh; /* shifts centre-point upward */
+          opacity: clamp(0, calc(1 - var(--p) * 2.5), 1);
+          transform: translateY(calc(var(--p) * -24px));
+          will-change: opacity, transform;
+          animation: tagline-in 1.1s cubic-bezier(.22,.61,.36,1) both;
+        }
+        @keyframes tagline-in {
+          from { opacity: 0; transform: translateY(16px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        .hero__tagline-l1 {
+          font-family: var(--font-primary), 'Georgia', serif;
+          font-size: clamp(2.1rem, 6.5vw, 4.2rem);
+          font-weight: 700;
+          font-style: italic;
+          line-height: 1.15;
+          letter-spacing: 0.01em;
+          color: rgba(255, 255, 255, 0.96);
+          text-shadow:
+            0 2px 24px rgba(60, 35, 5, 0.55),
+            0 0  60px rgba(243, 207, 114, 0.25);
+          margin: 0 0 0.35em;
+        }
+        .hero__tagline-l2 {
+          font-family: var(--font-primary), 'Georgia', serif;
+          font-size: clamp(1.6rem, 5vw, 3.2rem);
+          font-weight: 500;
+          font-style: italic;
+          line-height: 1.15;
+          letter-spacing: 0.01em;
+          color: rgba(255, 255, 255, 0.60);
+          text-shadow: 0 2px 18px rgba(60, 35, 5, 0.45);
+          margin: 0;
         }
       `}</style>
     </section>
