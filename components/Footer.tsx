@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 
 const FOOTER_LINKS = [
@@ -22,12 +20,27 @@ export default function Footer() {
             <span className="footer__logo-text">Eagles Wings UK</span>
           </Link>
 
+          {/* Navigation Links */}
+          <nav className="footer__nav" aria-label="Footer navigation">
+            {FOOTER_LINKS.map(({ label, href }) => (
+              <Link key={href} href={href} className="footer__link">
+                {label}
+              </Link>
+            ))}
+          </nav>
+
+          {/* Action */}
+          <div className="footer__actions">
+            <Link href="/donate" className="footer__donate-btn">
+              Donate
+            </Link>
+          </div>
         </div>
 
         {/* Bottom Metadata Bar */}
         <div className="footer__bottom">
           <p className="footer__copyright">
-            © {new Date().getFullYear()} Eagle’s Wings Ministries UK. All rights reserved.
+            © 2026 Eagle&apos;s Wings Ministries UK. All rights reserved.
           </p>
 
           <div className="footer__meta">
