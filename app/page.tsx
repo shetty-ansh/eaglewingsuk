@@ -2,6 +2,8 @@
 
 import { useEffect, useRef } from "react";
 import About from "@/components/About";
+import ReachOut from "@/components/ReachOut";
+import Footer from "@/components/Footer";
 
 const MOBILE_SRC = "/images/jesus-potrait.png";
 const DESKTOP_SRC = "/images/jesus-landscape.png";
@@ -9,8 +11,8 @@ const ACCENT = "#f7f1e6";
 
 // ── Timing & Focus Controls (0.0 = top of hero, 1.0 = scroll complete) ───
 // Adjust these values to control when the About section appears:
-const ABOUT_FADE_START = 0.80; // Scroll point where About starts fading in
-const ABOUT_FADE_END = 0.95;   // Scroll point where About reaches full opacity
+const ABOUT_FADE_START = 0.50; // Scroll point where About starts fading in
+const ABOUT_FADE_END = 0.80;   // Scroll point where About reaches full opacity
 
 const ORBS = [
   { x: 20, size: 90, travel: 95, grow: 1.6, blur: 8, alpha: 0.45, float: 8 },
@@ -21,7 +23,13 @@ const ORBS = [
 ];
 
 export default function RootPage() {
-  return <HeroSection />;
+  return (
+    <>
+      <HeroSection />
+      <ReachOut />
+      <Footer />
+    </>
+  );
 }
 
 function HeroSection() {
@@ -143,7 +151,7 @@ function HeroSection() {
           --about-start: ${ABOUT_FADE_START};
           --about-end: ${ABOUT_FADE_END};
           position: relative;
-          height: 115vh;
+          height: 160vh;
           background: var(--accent);
         }
         .hero__stage {

@@ -5,43 +5,43 @@ import Link from "next/link";
 export default function About() {
   return (
     <div className="hero__about" id="about" aria-label="About Eagles Wings UK">
-      {/* ── Fullscreen Card Container ── */}
-      <div className="about__card">
-        {/* Top Header & Copy */}
+      {/* ── Left Half (Laptop) / Top Half (Mobile): Text ── */}
+      <div className="about__text-wrap">
         <div className="about__content">
-          {/* Top muted paragraph */}
-          <p className="about__intro">
-            Inspired by Isaiah 40:31, Eagle’s Wings Ministries UK is driven by a
-            passion to encourage, guide, and equip church leaders with spiritual
-            renewal and vision.
-          </p>
-          <p className="about__intro">
-            Founded by Mike and Angie following Mike’s miraculous healing from chronic pain in 2003, Eagle’s Wings Ministries UK grew out of their personal experience of God’s restoring power and faithfulness. Their journey inspired a deep desire to support not only ordained ministers but all those serving in church leadership, helping them overcome challenges, find fresh strength in the Lord, and fulfil His calling with renewed purpose and confidence.
-          </p>
+          {/* One big bold title */}
+          <h2 className="about__title">
+            Encouraging and equipping church leaders across the nation.
+          </h2>
 
-          {/* Underlined category / link */}
-          <div className="about__link-wrap">
-            <Link href="/what-we-do" className="about__link">
-              What we do?
-            </Link>
+          {/* 2 small lines */}
+          <div className="about__lines">
+            <p>
+              Inspired by Isaiah 40:31, we offer personal consultations and
+              spiritual renewal for church leaders.
+            </p>
+            <p>
+              Helping ministers rediscover God’s vision and lead with renewed
+              confidence in the Gospel.
+            </p>
           </div>
 
-          {/* Main prominent heading */}
-          <h2 className="about__heading">
-            We encourage and equip church leaders to become strong, Christ-like
-            servant leaders.
-          </h2>
+          {/* Underlined "Know more" linking to /about */}
+          <div className="about__action">
+            <Link href="/about" className="about__link">
+              Know more
+            </Link>
+          </div>
         </div>
+      </div>
 
-        {/* Rounded image taking the lower screen area */}
-        <div className="about__image-wrap">
-          <img
-            src="https://thumb.wikimedia.org/wikipedia/commons/thumb/c/ca/Tabernacle_of_OP_Edit_1.jpg/500px-Tabernacle_of_OP_Edit_1.jpg"
-            alt="Eagles Wings UK ministry journey"
-            className="about__image"
-            loading="lazy"
-          />
-        </div>
+      {/* ── Right Half (Laptop) / Bottom Half (Mobile): Frameless Image ── */}
+      <div className="about__image-wrap">
+        <img
+          src="https://thumb.wikimedia.org/wikipedia/commons/thumb/c/ca/Tabernacle_of_OP_Edit_1.jpg/500px-Tabernacle_of_OP_Edit_1.jpg"
+          alt="Eagles Wings UK ministry journey"
+          className="about__image"
+          loading="lazy"
+        />
       </div>
 
       <style>{`
@@ -50,13 +50,14 @@ export default function About() {
           position: absolute;
           inset: 0;
           width: 100%;
-          height: 100%;
+          height: 100vh;
           height: 100svh;
           z-index: 20;
-          background: #fbf7ef;
+          background: #f7f1e6;
           display: flex;
+          flex-direction: row; /* Horizontal on laptop */
           align-items: stretch;
-          justify-content: center;
+          justify-content: stretch;
           /* Controlled by ABOUT_FADE_START and ABOUT_FADE_END from Hero */
           opacity: clamp(0, calc((var(--p) - var(--about-start)) / (var(--about-end) - var(--about-start))), 1);
           will-change: opacity;
@@ -67,165 +68,154 @@ export default function About() {
           pointer-events: auto;
         }
 
-        /* ── Fullscreen Card Canvas ────────────────────────────────── */
-        .about__card {
-          width: 100%;
+        /* ── Left Half: Text Container (Laptop) ─────────────────────── */
+        .about__text-wrap {
+          width: 50%;
           height: 100%;
-          max-width: 1120px;
-          max-width: 1240px;
-          margin: 0 auto;
-          padding: 6rem 2.5rem 2.25rem;
-          padding: 6.5rem 3rem 3rem;
+          height: 100vh;
+          height: 100svh;
           display: flex;
-          flex-direction: column;
-          flex-direction: row;
           align-items: center;
-          justify-content: space-between;
-          text-align: left;
+          justify-content: center;
+          padding: 6.5rem 4rem 3rem;
           box-sizing: border-box;
-          gap: 1.5rem;
-          gap: 4rem;
         }
 
         .about__content {
-          max-width: 780px;
-          flex: 1;
-          max-width: 580px;
+          width: 100%;
+          max-width: 560px;
           display: flex;
           flex-direction: column;
+          align-items: flex-start;
+          text-align: left;
         }
 
-        /* ── Top intro text ────────────────────────────────────────── */
-        .about__intro {
+        /* ── One Big Bold Title ────────────────────────────────────── */
+        .about__title {
           font-family: var(--font-manrope), -apple-system, sans-serif;
-          font-size: clamp(0.85rem, 1.4vw, 1rem);
-          line-height: 1.55;
-          font-size: clamp(0.88rem, 1.1vw, 1.02rem);
-          line-height: 1.6;
-          color: #786550;
-          margin: 0 0 1.25rem;
-          font-weight: 400;
+          font-size: clamp(1.85rem, 2.7vw, 2.85rem);
+          font-weight: 800;
+          line-height: 1.18;
+          letter-spacing: -0.025em;
+          color: #17120b;
+          margin: 0 0 1rem;
         }
 
-        /* ── Underlined Link ───────────────────────────────────────── */
-        .about__link-wrap {
-          margin-bottom: 0.75rem;
-          margin-bottom: 0.85rem;
+        /* ── 2 Small Lines ─────────────────────────────────────────── */
+        .about__lines {
+          font-family: var(--font-manrope), -apple-system, sans-serif;
+          font-size: clamp(0.88rem, 1.1vw, 1.05rem);
+          line-height: 1.6;
+          color: #6b5845;
+          font-weight: 400;
+          margin: 0 0 1.5rem;
+          max-width: 500px;
+          display: flex;
+          flex-direction: column;
+          gap: 0.35rem;
         }
+
+        .about__lines p {
+          margin: 0;
+        }
+
+        /* ── Underlined "Know more" ────────────────────────────────── */
+        .about__action {
+          margin-top: 0.25rem;
+        }
+
         .about__link {
           font-family: var(--font-manrope), -apple-system, sans-serif;
-          font-size: clamp(0.95rem, 1.6vw, 1.1rem);
-          font-size: clamp(0.95rem, 1.2vw, 1.1rem);
-          font-weight: 500;
-          color: #24190e;
+          font-size: clamp(0.95rem, 1.2vw, 1.12rem);
+          font-weight: 600;
+          color: #17120b;
           text-decoration: underline;
-          text-underline-offset: 4px;
+          text-underline-offset: 5px;
           text-decoration-thickness: 1.5px;
-          text-decoration-color: #24190e;
+          text-decoration-color: #17120b;
           transition: color 0.2s, text-decoration-color 0.2s;
         }
+
         .about__link:hover {
           color: #c8973a;
           text-decoration-color: #c8973a;
         }
 
-        /* ── Heading ───────────────────────────────────────────────── */
-        .about__heading {
-          font-family: var(--font-manrope), -apple-system, sans-serif;
-          font-size: clamp(1.4rem, 2.8vw, 2.2rem);
-          font-size: clamp(1.6rem, 2.4vw, 2.35rem);
-          font-weight: 600;
-          line-height: 1.22;
-          line-height: 1.25;
-          letter-spacing: -0.02em;
-          color: #1f160d;
-          margin: 0;
-        }
-
-        /* ── Full Bottom image ─────────────────────────────────────── */
-        /* ── Right image on laptop ─────────────────────────────────── */
+        /* ── Right Half: Frameless Edge-to-Edge Image (Laptop) ──────── */
         .about__image-wrap {
-          flex: 1;
-          width: 100%;
-          flex: 1;
-          min-height: 180px;
-          max-width: 560px;
-          height: auto;
-          aspect-ratio: 16 / 11;
-          min-height: 340px;
-          max-height: 480px;
-          border-radius: 24px;
+          width: 50%;
+          height: 100%;
+          height: 100vh;
+          height: 100svh;
+          margin: 0;
+          padding: 0;
+          border-radius: 0;
+          border: none;
+          box-shadow: none;
           overflow: hidden;
           background: #eadfc9;
-          box-shadow: 0 16px 40px -15px rgba(60, 45, 20, 0.12);
-          box-shadow: 0 20px 45px -15px rgba(60, 45, 20, 0.14);
-          border: 1px solid rgba(200, 151, 58, 0.15);
         }
+
         .about__image {
           width: 100%;
           height: 100%;
           object-fit: cover;
           object-position: center;
           display: block;
+          border-radius: 0;
+          border: none;
         }
 
-        /* ── Mobile adjustments ────────────────────────────────────── */
-        @media (max-width: 640px) {
-        /* ── Mobile & Tablet view: Text on top, Image on bottom ───── */
+        /* ── Mobile View: Vertical Split (50vh text / 50vh image) ─── */
         @media (max-width: 900px) {
-          .about__card {
-            padding: 5.25rem 1.25rem 1.25rem;
-            gap: 1rem;
+          .hero__about {
             flex-direction: column;
-            justify-content: space-between;
-            align-items: stretch;
-            padding: 5.5rem 1.5rem 1.5rem;
-            gap: 1.25rem;
+          }
+          .about__text-wrap {
+            width: 100%;
+            height: 50vh;
+            height: 50svh;
+            padding: 4.5rem 1.75rem 1.5rem;
           }
           .about__content {
             max-width: 100%;
           }
-          .about__intro {
+          .about__title {
+            font-size: clamp(1.4rem, 5.2vw, 1.95rem);
+            margin-bottom: 0.65rem;
+          }
+          .about__lines {
             font-size: 0.82rem;
-            margin-bottom: 0.85rem;
             line-height: 1.45;
-          }
-          .about__link-wrap {
-            margin-bottom: 0.5rem;
-          }
-          .about__heading {
-            font-size: 1.25rem;
-            line-height: 1.25;
+            margin-bottom: 0.85rem;
+            gap: 0.25rem;
           }
           .about__image-wrap {
-            flex: 1;
-            max-width: 100%;
-            border-radius: 18px;
-            min-height: 160px;
-            max-height: 400px;
-            aspect-ratio: 16 / 10;
+            width: 100%;
+            height: 50vh;
+            height: 50svh;
           }
         }
 
-        @media (max-height: 720px) {
         @media (max-width: 480px) {
-          .about__card {
-            padding: 5.25rem 1.25rem 1.25rem;
-            gap: 1rem;
+          .about__text-wrap {
+            padding: 4.25rem 1.25rem 1.25rem;
+          }
+          .about__title {
+            font-size: clamp(1.3rem, 5.5vw, 1.75rem);
           }
         }
 
-        @media (max-width: 900px) and (max-height: 720px) {
-          .about__card {
-            padding-top: 4.75rem;
-            padding-bottom: 1rem;
-            gap: 0.75rem;
+        @media (max-width: 900px) and (max-height: 680px) {
+          .about__text-wrap {
+            padding-top: 3.75rem;
+            padding-bottom: 0.75rem;
           }
-          .about__intro {
-            margin-bottom: 0.5rem;
+          .about__title {
+            margin-bottom: 0.45rem;
           }
-          .about__image-wrap {
-            min-height: 140px;
+          .about__lines {
+            margin-bottom: 0.65rem;
           }
         }
       `}</style>

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 
 const NAV_LINKS = [
@@ -13,18 +14,24 @@ const NAV_LINKS = [
 ];
 
 export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
+  const pathname = usePathname();
+  const isHome = pathname === "/";
+  const [homeScrolled, setHomeScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
+  // On subpages (like /about), navbar text is always dark/black.
+  // On the home page, it changes dynamically when the About section comes into focus.
+  const isScrolled = !isHome || homeScrolled;
+
   useEffect(() => {
-    // Switch to scrolled/frosted navbar only when the About section comes into focus
+    if (!isHome) return;
     const handleAboutInView = (e: Event) => {
       const customEvent = e as CustomEvent<{ inView: boolean }>;
-      setScrolled(customEvent.detail.inView);
+      setHomeScrolled(customEvent.detail.inView);
     };
     window.addEventListener("about-in-view", handleAboutInView);
     return () => window.removeEventListener("about-in-view", handleAboutInView);
-  }, []);
+  }, [isHome]);
 
   return (
     <>
@@ -45,7 +52,7 @@ export default function Navbar() {
               className={[
                 "font-[family-name:var(--font-primary)] text-[1.15rem] font-medium",
                 "transition-[color,text-shadow] duration-[400ms]",
-                scrolled
+                isScrolled
                   ? "text-black [text-shadow:none]"
                   : "text-white [text-shadow:0_1px_3px_rgba(100,70,20,0.6),0_0_18px_rgba(243,207,114,0.5)]",
               ].join(" ")}
@@ -67,7 +74,7 @@ export default function Navbar() {
                   "relative group no-underline",
                   "font-[family-name:var(--font-manrope)] text-[0.72rem] font-medium tracking-[0.13em] uppercase",
                   "px-3 py-1.5 transition-[color,text-shadow] duration-300",
-                  scrolled
+                  isScrolled
                     ? "text-black hover:text-black/70 [text-shadow:none]"
                     : "text-white/90 hover:text-white [text-shadow:0_1px_4px_rgba(80,50,10,0.55)] hover:[text-shadow:0_0_12px_rgba(243,207,114,0.8)]",
                 ].join(" ")}
@@ -77,7 +84,7 @@ export default function Navbar() {
                 <span
                   className={[
                     "absolute bottom-[-1px] left-3 right-3 h-px scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center",
-                    scrolled ? "bg-black" : "bg-[#e6b96a]",
+                    isScrolled ? "bg-black" : "bg-[#e6b96a]",
                   ].join(" ")}
                 />
               </Link>
@@ -94,7 +101,7 @@ export default function Navbar() {
                 "no-underline font-[family-name:var(--font-manrope)] text-[0.72rem] font-semibold tracking-[0.16em] uppercase",
                 "px-5 py-[0.45rem] rounded-sm border-[1.5px]",
                 "transition-[background,border-color,color,box-shadow] duration-300",
-                scrolled
+                isScrolled
                   ? "text-black border-black bg-transparent hover:bg-black hover:text-white"
                   : [
                     "text-white border-white/65 bg-white/[0.08] backdrop-blur-sm",
@@ -118,7 +125,7 @@ export default function Navbar() {
                   key={i}
                   className={[
                     "block h-[1.5px] rounded-sm transition-colors duration-300",
-                    scrolled ? "bg-black" : "bg-white/85",
+                    isScrolled ? "bg-black" : "bg-white/85",
                   ].join(" ")}
                 />
               ))}
