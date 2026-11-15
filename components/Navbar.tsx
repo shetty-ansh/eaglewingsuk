@@ -31,13 +31,7 @@ export default function Navbar() {
       {/* ── Header ───────────────────────────────────────────────────── */}
       <header
         role="banner"
-        className={[
-          "fixed inset-x-0 top-0 z-[100] h-[72px] border-b",
-          "transition-[background,border-color,box-shadow,backdrop-filter] duration-[400ms] ease-[cubic-bezier(.25,.46,.45,.94)]",
-          scrolled
-            ? "bg-[rgba(255,248,232,0.92)] backdrop-blur-[18px] saturate-[1.4] border-[rgba(200,151,58,0.25)] shadow-[0_1px_28px_rgba(190,140,50,0.10)]"
-            : "bg-transparent border-transparent",
-        ].join(" ")}
+        className="fixed inset-x-0 top-0 z-[100] h-[72px] bg-transparent border-b border-transparent"
       >
         <div className="max-w-[1280px] mx-auto h-full px-8 flex items-center gap-8">
 
@@ -49,10 +43,10 @@ export default function Navbar() {
           >
             <span
               className={[
-                "font-[family-name:var(--font-primary)] text-[1.15rem] font-medium italic tracking-[0.06em]",
+                "font-[family-name:var(--font-primary)] text-[1.15rem] font-medium",
                 "transition-[color,text-shadow] duration-[400ms]",
                 scrolled
-                  ? "text-[#3d2e18] [text-shadow:none]"
+                  ? "text-black [text-shadow:none]"
                   : "text-white [text-shadow:0_1px_3px_rgba(100,70,20,0.6),0_0_18px_rgba(243,207,114,0.5)]",
               ].join(" ")}
             >
@@ -74,13 +68,18 @@ export default function Navbar() {
                   "font-[family-name:var(--font-manrope)] text-[0.72rem] font-medium tracking-[0.13em] uppercase",
                   "px-3 py-1.5 transition-[color,text-shadow] duration-300",
                   scrolled
-                    ? "text-[#6b5433] hover:text-[#c8973a] [text-shadow:none]"
+                    ? "text-black hover:text-black/70 [text-shadow:none]"
                     : "text-white/90 hover:text-white [text-shadow:0_1px_4px_rgba(80,50,10,0.55)] hover:[text-shadow:0_0_12px_rgba(243,207,114,0.8)]",
                 ].join(" ")}
               >
                 {label}
                 {/* Grow-from-centre underline on hover */}
-                <span className="absolute bottom-[-1px] left-3 right-3 h-px bg-[#e6b96a] scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center" />
+                <span
+                  className={[
+                    "absolute bottom-[-1px] left-3 right-3 h-px scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center",
+                    scrolled ? "bg-black" : "bg-[#e6b96a]",
+                  ].join(" ")}
+                />
               </Link>
             ))}
           </nav>
@@ -96,10 +95,7 @@ export default function Navbar() {
                 "px-5 py-[0.45rem] rounded-sm border-[1.5px]",
                 "transition-[background,border-color,color,box-shadow] duration-300",
                 scrolled
-                  ? [
-                    "text-[#c8973a] border-[#c8973a] bg-transparent",
-                    "hover:bg-[#c8973a] hover:text-white hover:shadow-[0_0_14px_rgba(200,151,58,0.3)]",
-                  ].join(" ")
+                  ? "text-black border-black bg-transparent hover:bg-black hover:text-white"
                   : [
                     "text-white border-white/65 bg-white/[0.08] backdrop-blur-sm",
                     "[text-shadow:0_1px_3px_rgba(80,50,10,0.5)]",
@@ -122,7 +118,7 @@ export default function Navbar() {
                   key={i}
                   className={[
                     "block h-[1.5px] rounded-sm transition-colors duration-300",
-                    scrolled ? "bg-[#3d2e18]" : "bg-white/85",
+                    scrolled ? "bg-black" : "bg-white/85",
                   ].join(" ")}
                 />
               ))}
@@ -145,7 +141,7 @@ export default function Navbar() {
                 key={href}
                 href={href}
                 onClick={() => setMenuOpen(false)}
-                className="block no-underline font-[family-name:var(--font-manrope)] text-[0.85rem] tracking-[0.12em] uppercase text-[#6b5433] hover:text-[#c8973a] py-4 border-b border-[rgba(200,151,58,0.15)] transition-colors duration-200"
+                className="block no-underline font-[family-name:var(--font-manrope)] text-[0.85rem] tracking-[0.12em] uppercase text-black hover:text-black/60 py-4 border-b border-black/10 transition-colors duration-200"
               >
                 {label}
               </Link>
@@ -153,7 +149,7 @@ export default function Navbar() {
             <Link
               href="/donate"
               onClick={() => setMenuOpen(false)}
-              className="inline-block mt-6 no-underline font-[family-name:var(--font-manrope)] text-[0.75rem] font-semibold tracking-[0.16em] uppercase text-[#c8973a] border-[1.5px] border-[#c8973a] px-8 py-[0.65rem] rounded-full text-center transition-[background,color] duration-200 hover:bg-[#c8973a] hover:text-white"
+              className="inline-block mt-6 no-underline font-[family-name:var(--font-manrope)] text-[0.75rem] font-semibold tracking-[0.16em] uppercase text-black border-[1.5px] border-black px-8 py-[0.65rem] rounded-full text-center transition-[background,color] duration-200 hover:bg-black hover:text-white"
             >
               Donate
             </Link>

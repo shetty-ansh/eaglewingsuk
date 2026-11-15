@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import About from "@/components/About";
 
 const MOBILE_SRC = "/images/jesus-potrait.png";
 const DESKTOP_SRC = "/images/jesus-landscape.png";
@@ -44,6 +45,8 @@ function HeroSection() {
 
       // As soon as the light starts engulfing (any scroll > 0.02), instantly drop text shadow
       section.classList.toggle("hero--engulfing", p > 0.02);
+      // As soon as the light starts engulfing (any scroll > 0.015), text disappears completely
+      section.classList.toggle("hero--engulfing", p > 0.015);
 
       // Enable pointer events on About once it reaches view
       section.classList.toggle("hero--about-on", p >= ABOUT_FADE_END * 0.95);
@@ -122,32 +125,8 @@ function HeroSection() {
         {/* ── Parchment fill — covers everything at p=1 ── */}
         <div className="hero__fill" aria-hidden="true" />
 
-        {/* ── About — fades in from behind the light ────── */}
-        {/* Sits above the fill (z:20). Pointer-events off   */}
-        {/* until hero--about-on class is set by scroll JS. */}
-        <div className="hero__about" id="about" aria-label="About Eagles Wings UK">
-          <div className="about__inner">
-
-            <p className="about__eyebrow">Who We Are</p>
-
-            <h2 className="about__heading">
-              Standing with Israel,<br />
-              rooted in faith.
-            </h2>
-
-            <div className="about__divider" aria-hidden="true" />
-
-            <p className="about__body">
-              Eagles Wings UK is a Christian organisation dedicated to building
-              bridges of friendship between the Church and the Jewish people.
-              Grounded in the biblical covenant between God and Israel, we
-              mobilise communities across the United Kingdom to pray, advocate,
-              and journey alongside the nation of Israel.
-            </p>
-
-            <a href="/about" className="about__cta">Learn more</a>
-          </div>
-        </div>
+        {/* ── About section component (fades in as light completes) ── */}
+        <About />
 
         {/* ── Tagline — fades out as scroll begins ──────── */}
         <div className="hero__tagline" aria-label="Tagline">
@@ -185,8 +164,10 @@ function HeroSection() {
           height: 100%;
           object-fit: cover;
           object-position: center;
+          transform: scale(calc(1 + var(--p) * 0.1));
+          transform-origin: center center;
           filter: brightness(calc(1 + var(--p) * 0.15)) saturate(calc(1 - var(--p) * 0.3));
-          will-change: filter;
+          will-change: filter, transform;
         }
 
         /* ── Ambient glow ──────────────────────────────────────────── */
@@ -285,81 +266,6 @@ function HeroSection() {
           will-change: opacity;
         }
 
-        /* ── About overlay ─────────────────────────────────────────── */
-        /* Fades in through the parchment once the light is complete.  */
-        .hero__about {
-          position: absolute;
-          inset: 0;
-          z-index: 20;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 7rem 2rem;
-          /* Controlled by ABOUT_FADE_START and ABOUT_FADE_END */
-          opacity: clamp(0, calc((var(--p) - var(--about-start)) / (var(--about-end) - var(--about-start))), 1);
-          will-change: opacity;
-          /* Not interactive until the scroll JS adds hero--about-on */
-          pointer-events: none;
-        }
-        .hero--about-on .hero__about {
-          pointer-events: auto;
-        }
-
-        .about__inner {
-          max-width: 640px;
-          text-align: center;
-        }
-        .about__eyebrow {
-          font-family: var(--font-manrope), sans-serif;
-          font-size: 0.7rem;
-          font-weight: 600;
-          letter-spacing: 0.22em;
-          text-transform: uppercase;
-          color: #b08a4a;
-          margin: 0 0 1.5rem;
-        }
-        .about__heading {
-          font-family: var(--font-primary), 'Georgia', serif;
-          font-size: clamp(1.9rem, 4.5vw, 3rem);
-          font-weight: 500;
-          line-height: 1.2;
-          color: #2c1f0e;
-          margin: 0 0 2rem;
-          letter-spacing: -0.01em;
-        }
-        .about__divider {
-          width: 48px;
-          height: 1px;
-          background: #c8973a;
-          margin: 0 auto 2rem;
-          opacity: 0.6;
-        }
-        .about__body {
-          font-family: var(--font-manrope), sans-serif;
-          font-size: 1rem;
-          font-weight: 400;
-          line-height: 1.8;
-          color: #5a4228;
-          margin: 0 0 2.5rem;
-        }
-        .about__cta {
-          display: inline-block;
-          text-decoration: none;
-          font-family: var(--font-manrope), sans-serif;
-          font-size: 0.72rem;
-          font-weight: 600;
-          letter-spacing: 0.18em;
-          text-transform: uppercase;
-          color: #b08a4a;
-          border-bottom: 1px solid rgba(176, 138, 74, 0.4);
-          padding-bottom: 3px;
-          transition: color 0.25s, border-color 0.25s;
-        }
-        .about__cta:hover {
-          color: #8a6530;
-          border-color: #8a6530;
-        }
-
         /* ── Tagline ───────────────────────────────────────────────── */
         .hero__tagline {
           position: absolute;
@@ -379,6 +285,11 @@ function HeroSection() {
           transition: opacity 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94),
                       transform 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
           animation: tagline-in 1.1s cubic-bezier(.22,.61,.36,1) both;
+          will-change: opacity, transform, visibility;
+          transition: opacity 0.25s ease-out,
+                      visibility 0.25s ease-out,
+                      transform 0.25s ease-out;
+          animation: tagline-in 1.1s cubic-bezier(.22,.61,.36,1);
         }
         @keyframes tagline-in {
           from { opacity: 0; transform: translateY(16px); }
@@ -388,7 +299,6 @@ function HeroSection() {
           font-family: var(--font-primary), 'Georgia', serif;
           font-size: clamp(2.1rem, 6.5vw, 4.2rem);
           font-weight: 700;
-          font-style: italic;
           line-height: 1.15;
           letter-spacing: 0.01em;
           color: rgba(255, 255, 255, 0.96);
@@ -401,7 +311,6 @@ function HeroSection() {
           font-family: var(--font-primary), 'Georgia', serif;
           font-size: clamp(1.6rem, 5vw, 3.2rem);
           font-weight: 500;
-          font-style: italic;
           line-height: 1.15;
           letter-spacing: 0.01em;
           color: rgba(255, 255, 255, 0.60);
@@ -410,22 +319,25 @@ function HeroSection() {
         }
 
         /* When light starts engulfing: instantly drop shadows and fade text out */
+        /* When light comes in: text and shadows disappear completely */
+        .hero--engulfing .hero__tagline {
+          opacity: 0 !important;
+          visibility: hidden !important;
+          transform: translateY(-16px) !important;
+          pointer-events: none !important;
+        }
         .hero--engulfing .hero__tagline-l1,
         .hero--engulfing .hero__tagline-l2 {
           text-shadow: none !important;
-        }
-        .hero--engulfing .hero__tagline {
-          opacity: 0;
-          transform: translateY(-20px);
         }
 
         @media (prefers-reduced-motion: reduce) {
           .hero__orb i  { animation: none; }
           .hero__tagline { animation: none; }
+          .hero__image { transform: none; }
         }
         @media (max-width: 767px) {
           .hero__orb { scale: 0.7; }
-          .about__heading { font-size: clamp(1.6rem, 6vw, 2.4rem); }
         }
       `}</style>
     </section>
